@@ -1,0 +1,9 @@
+node_modules
+*.ssh*
+.*.swp
+.DS_Store
+*.pyc
+dump/
+*api*key*
+personal*
+__pycache__
