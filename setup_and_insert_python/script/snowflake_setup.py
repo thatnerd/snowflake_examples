@@ -34,14 +34,14 @@ def create_warehouse(conn: SnowflakeConnection, warehouse_name: str) -> str:
     cur = conn.cursor()
     cur.execute(f"CREATE WAREHOUSE IF NOT EXISTS {warehouse_name}")
     cur.close()
-    return f"Warehouse '{warehouse_name}' created."
+    return f"Warehouse '{warehouse_name}' created or already present."
 
 def create_database(conn: SnowflakeConnection, database_name: str) -> str:
     """Create a database in Snowflake and return a success message."""
     cur = conn.cursor()
     cur.execute(f"CREATE DATABASE IF NOT EXISTS {database_name}")
     cur.close()
-    return f"Database '{database_name}' created."
+    return f"Database '{database_name}' created or already present."
 
 def create_schema(conn: SnowflakeConnection, database_name: str, schema_name: str) -> str:
     """Create a schema in Snowflake and return a success message."""
@@ -49,7 +49,7 @@ def create_schema(conn: SnowflakeConnection, database_name: str, schema_name: st
     cur.execute(f"USE DATABASE {database_name}")
     cur.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
     cur.close()
-    return f"Schema '{schema_name}' created in database '{database_name}'."
+    return f"Schema '{schema_name}' created or already present in database '{database_name}'."
 
 def create_table(conn: SnowflakeConnection, database_name: str, schema_name: str, table_name: str) -> str:
     """Create a table in Snowflake and return a success message."""
@@ -57,7 +57,7 @@ def create_table(conn: SnowflakeConnection, database_name: str, schema_name: str
     cur.execute(f"USE SCHEMA {database_name}.{schema_name}")
     cur.execute(f"CREATE OR REPLACE TABLE {table_name} (id INTEGER, data STRING)")
     cur.close()
-    return f"Table '{table_name}' created in schema '{schema_name}'."
+    return f"Table '{table_name}' created or already present in schema '{schema_name}'."
 
 def insert_data(conn: SnowflakeConnection, database_name: str, schema_name: str, table_name: str, warehouse_name: str) -> str:
     """Insert data into a table in Snowflake and return a success message."""
@@ -73,7 +73,7 @@ def initialize_resources(conn: SnowflakeConnection, warehouse: str, database: st
     print(create_database(conn, database))
     print(create_schema(conn, database, schema))
     print(create_table(conn, database, schema, table))
-    print(insert_data(conn, database, schema, table))
+    print(insert_data(conn, database, schema, table, warehouse))
 
 def cleanup_resources(conn: SnowflakeConnection, warehouse: str, database: str, schema: str, table: str) -> str:
     """Clean up Snowflake resources: delete warehouse, database, schema, and table."""
@@ -83,7 +83,7 @@ def cleanup_resources(conn: SnowflakeConnection, warehouse: str, database: str, 
     cur.execute(f"DROP DATABASE IF EXISTS {database}")
     cur.execute(f"DROP WAREHOUSE IF EXISTS {warehouse}")
     cur.close()
-    return f"Clean-up completed: Table '{table}', Schema '{schema}', Database '{database}', Warehouse '{warehouse}' deleted."
+    return f"Clean-up completed: Table '{table}', Schema '{schema}', Database '{database}', Warehouse '{warehouse}' deleted (if present)."
 
 def main(args: Dict[str, str]) -> None:
     # Snowflake connection credentials with default values
